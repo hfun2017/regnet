@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from data_util.TPS3d_dataset import TPS3d_dataset
 from data_util.cloth_dataset import cloth_dataset
+from data_util.body_dataset import body_dataset
 from utils import *
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +35,7 @@ def parse_args():
     parser.add_argument('--deform_level', type=float, default=0.3, help='TPS deform_level')
     parser.add_argument('--drop_num', type=int, default=None, )
     parser.add_argument('--out_liner_num', type=int, default=None, )
-    parser.add_argument('--dataset', type=str, default="tps", choices=["tps", "cloth"])
+    parser.add_argument('--dataset', type=str, default="tps", choices=["tps", "cloth", "body"])
     parser.add_argument('--noise',default=False,action='store_true')
     parser.add_argument('--unoise',default=False,action='store_true')
     return parser.parse_args()
@@ -76,13 +77,20 @@ def main(args):
     logger.addHandler(file_handler)
     log_string('INIT PARAMETERS ...')
     log_string(args)
-#############  DATASET   ####################
+
+    #############  DATASET   ####################
     if args.dataset == "tps":
         TRAIN_DATASET = TPS3d_dataset(point_size=args.npoint ,total_data=80000,deform_level=args.deform_level,drop_num=args.drop_num,out_liner_num=
                                       args.out_liner_num,noise=args.noise,unoise=args.unoise)
     elif args.dataset == "cloth":
         TRAIN_DATASET = cloth_dataset(args.npoint, 400, False, True,args.drop_num,out_liner_num=
                                       args.out_liner_num,noise=args.noise,unoise=args.unoise)
+    elif args.dataset == "body":
+        TRAIN_DATASET = body_dataset()
+    else:
+        print("load dataset error")
+        sys.exit(-1)
+
     trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batch_size, shuffle=True,
                                                   num_workers=0, drop_last=True)
     if args.dataset == "tps":
@@ -91,6 +99,9 @@ def main(args):
     elif args.dataset == "cloth":
         TEST_DATASET = cloth_dataset(args.npoint, 100, False, False,args.drop_num,out_liner_num=
                                       args.out_liner_num,noise=args.noise,unoise=args.unoise)
+    elif args.dataset == "body":
+        TEST_DATASET = body_dataset(train=False)
+
     testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                                  drop_last=True)
 

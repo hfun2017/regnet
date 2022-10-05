@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from data_util.TPS3d_dataset import TPS3d_dataset
 from data_util.cloth_dataset import cloth_dataset
+from data_util.body_dataset import body_dataset
 from utils import *
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +29,7 @@ def parse_args():
     parser.add_argument('--npoint', type=int, default=2048, help='Point Number [default: 2048]')
     parser.add_argument('--drop_num', type=int, default=None, )
     parser.add_argument('--deform_level', type=float, default=0.3, )
-    parser.add_argument('--dataset', type=str, default="tps", choices=["tps", "cloth"])
+    parser.add_argument('--dataset', type=str, default="tps", choices=["tps", "cloth","body"])
     parser.add_argument('--out_liner_num', type=int, default=None, )
     parser.add_argument('--noise',default=False,action='store_true')
     parser.add_argument('--unoise',default=False,action='store_true')
@@ -81,6 +82,11 @@ def main(args):
     elif args.dataset == "cloth":
         TEST_DATASET = cloth_dataset(args.npoint, 100, False, False,args.drop_num,out_liner_num=
                                       args.out_liner_num,noise=args.noise,unoise=args.unoise)
+    elif args.dataset == "body":
+        TEST_DATASET = body_dataset(train=False)
+    else:
+        print("load dataset error")
+        sys.exit(-1)
 
     testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                                  drop_last=True)

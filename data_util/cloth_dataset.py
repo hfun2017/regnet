@@ -40,6 +40,7 @@ class cloth_dataset(Dataset):
         pair = []
         self.drop_num = drop_num
         self.point_size = point_size
+        # sample_size表示使用数据集中的多少个数据
         self.sample_size = sample_size
         self.use_rgb = use_rgb
         self.train = train
