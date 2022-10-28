@@ -7,7 +7,6 @@ class get_model(nn.Module):
         super(get_model, self).__init__()
         self.transformer = nn.Transformer(d_model, num_encoder_layers=3, num_decoder_layers=3)
         self.dgcnn=Encoder(d_model)
-        # self.pointnet = PointNetEncoder(channel, d_model)
         self.pointnetDecoder = DispGenerator(d_model)
 
     def forward(self, encoder_input: torch.Tensor, decoder_input: torch.Tensor, **kwargs):

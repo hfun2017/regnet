@@ -53,13 +53,12 @@ class body_dataset(Dataset):
 
     def __getitem__(self, index):
         t = torch.tensor(self.pair[index])
-        # t = torch_pc_normalize(t)
 
         # TODO:drop num 还没有实现
-        if self.drop_num is not None:  # 有问题
-            s1, s2 = drop_point(t[0], t[1], self.point_size, self.drop_num)
-            return s1, s2, s2
-        return t[0], t[1], t[1]  # 为了保持各个数据集的读取方式一致所以加了第三个数据
+        # if self.drop_num is not None:  # 有问题
+        #     s1, s2 = drop_point(t[0], t[1], self.point_size, self.drop_num)
+        #     return s1, s2, s2
+        return torch_pc_normalize(t[0]), torch_pc_normalize(t[1]), t[1]  # 为了保持各个数据集的读取方式一致所以加了第三个数据
 
     def __len__(self):
         return len(self.pair)
