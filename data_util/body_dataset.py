@@ -1,6 +1,5 @@
 # *_*coding:utf-8 *_*
 import warnings
-
 import h5py as h5
 import numpy as np
 import torch
@@ -47,14 +46,14 @@ class body_dataset(Dataset):
         total_data = dataset
         total_data = total_data[:, :point_size, :]
 
-        for idx in range(0, total_data.shape[0], 2):
+        for idx in range(0, total_data.shape[0]-1, 2):
             pair.append([total_data[idx], total_data[idx + 1]])
 
         self.pair = np.array(pair)
 
     def __getitem__(self, index):
         t = torch.tensor(self.pair[index])
-        t = torch_pc_normalize(t)
+        # t = torch_pc_normalize(t)
 
         # TODO:drop num 还没有实现
         if self.drop_num is not None:  # 有问题

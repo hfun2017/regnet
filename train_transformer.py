@@ -119,10 +119,12 @@ def main(args):
         classname = m.__class__.__name__
         if classname.find('Conv2d') != -1:
             torch.nn.init.xavier_normal_(m.weight.data)
-            torch.nn.init.constant_(m.bias.data, 0.0)
+            if m.bias is not None:
+                torch.nn.init.constant_(m.bias.data, 0.0)
         elif classname.find('Linear') != -1:
             torch.nn.init.xavier_normal_(m.weight.data)
-            torch.nn.init.constant_(m.bias.data, 0.0)
+            if m.bias is not None:
+                torch.nn.init.constant_(m.bias.data, 0.0)
 
     try:
         checkpoint = torch.load(str(experiment_dir) + '/checkpoints/best_model.pth')
@@ -133,7 +135,7 @@ def main(args):
     except:
         log_string('No existing model, starting training from scratch...')
         epoch = 0
-        model_loss = 999.0
+        model_loss = 9999.0
         classifier = classifier.apply(weights_init)
 
     if args.optimizer == 'Adam':
