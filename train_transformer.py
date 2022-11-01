@@ -92,7 +92,7 @@ def main(args):
         sys.exit(-1)
 
     trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batch_size, shuffle=True,
-                                                  num_workers=0, drop_last=True)
+                                                  num_workers=2, drop_last=True)
     if args.dataset == "tps":
         TEST_DATASET = TPS3d_dataset(point_size=args.npoint ,total_data=3000,deform_level=args.deform_level,drop_num=args.drop_num,
                                      out_liner_num= args.out_liner_num,noise=args.noise,unoise=args.unoise)
