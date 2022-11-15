@@ -254,7 +254,7 @@ def chamfer_loss(x, y, ps=91):
     return ls.mean()
 
 
-def gaussian_mix_loss(x, y, var=1, ps=91, w=0, sigma=20):
+def gaussian_mix_loss(x, y, var=1, sigma=20):
     """
 
     :param x: tensor. [B,C,N]
@@ -272,11 +272,11 @@ def gaussian_mix_loss(x, y, var=1, ps=91, w=0, sigma=20):
     ps = A.shape[1]
     A = (A.unsqueeze(2)).repeat(1, 1, ps, 1)
     B = (B.unsqueeze(1)).repeat(1, ps, 1, 1)
-    sigma_inverse = ((torch.eye(2) * (1.0 / var)).unsqueeze(0).unsqueeze(0).unsqueeze(0)).repeat(
+    sigma_inverse = ((torch.eye(3) * (1.0 / var)).unsqueeze(0).unsqueeze(0).unsqueeze(0)).repeat(
         [bs, ps, ps, 1, 1]).cuda()
     sigma_inverse = sigma * sigma_inverse
-    sigma_inverse = sigma_inverse.view(-1, 2, 2)
-    tmp1 = (A - B).unsqueeze(-2).view(-1, 1, 2)
+    sigma_inverse = sigma_inverse.view(-1, 3, 3)
+    tmp1 = (A - B).unsqueeze(-2).view(-1, 1, 3)
     tmp = torch.bmm(tmp1, sigma_inverse)
     tmp = torch.bmm(tmp, tmp1.permute(0, 2, 1))
     tmp = tmp.view(bs, ps, ps)
@@ -436,11 +436,22 @@ def drop_point(pc: torch.Tensor, pc2: torch.Tensor, point_size: int, drop_num: i
     rand_int = random.randint(0, point_size - 1)  # 选一个点出来
     rand_int2 = random.randint(0, point_size - 1)  # 选一个点出来
     query_points, query_points2 = pc[:, rand_int:rand_int + 1, :], pc2[:, rand_int2:rand_int2 + 1, :]
-    pc, pc2 = exclude_query_ball(drop_num, pc, query_points), exclude_query_ball(drop_num, pc2,query_points2)
+    pc, pc2 = exclude_query_ball(drop_num, pc, query_points), exclude_query_ball(drop_num, pc2, query_points2)
     return pc.squeeze(0), pc2.squeeze(0)
 
 
 if __name__ == '__main__':
-    xyz = torch.rand([4, 32, 3])
-    torch_sum = torch.sum(xyz, dim=0)
-    print(torch_sum.size())
+    import h5py
+    # Test of gaussian_loss
+    with h5py.File("data/trainset.h5") as f:
+        dataset = f['xyz2']
+        m1, m2, m3 = dataset[0], dataset[1], dataset[2],
+        m1, m2, m3 = torch.Tensor(m1), torch.Tensor(m2), torch.Tensor(m3)
+        m1, m2, m3 = m1.view([1024, 3, 1]).permute(2, 1, 0), m2.view([1024, 3, 1]).permute(2, 1, 0), m3.view(
+            [1024, 3, 1]).permute(2, 1, 0)
+        print(gaussian_mix_loss(m1, m2))  # 1.46
+        print(gaussian_mix_loss(m2, m1))  # 1.45
+        print(gaussian_mix_loss(m1, m3))  # 1.40
+        print(gaussian_mix_loss(m2, m3))  # 1.47
+        print(gaussian_mix_loss(m1, m1))  # 1.13
+        print(gaussian_mix_loss(m2, m2))  # 1.05
