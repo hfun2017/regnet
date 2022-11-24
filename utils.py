@@ -272,8 +272,8 @@ def gaussian_mix_loss(x, y, var=1, sigma=20):
     ps = A.shape[1]
     A = (A.unsqueeze(2)).repeat(1, 1, ps, 1)
     B = (B.unsqueeze(1)).repeat(1, ps, 1, 1)
-    sigma_inverse = ((torch.eye(3) * (1.0 / var)).unsqueeze(0).unsqueeze(0).unsqueeze(0)).repeat(
-        [bs, ps, ps, 1, 1]).cuda()
+    sigma_inverse = ((torch.eye(3) * (1.0 / var)).cuda().unsqueeze(0).unsqueeze(0).unsqueeze(0)).repeat(
+        [bs, ps, ps, 1, 1])
     sigma_inverse = sigma * sigma_inverse
     sigma_inverse = sigma_inverse.view(-1, 3, 3)
     tmp1 = (A - B).unsqueeze(-2).view(-1, 1, 3)

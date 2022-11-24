@@ -21,8 +21,8 @@ class get_model(nn.Module):
 
         displacement = self.pointnetDecoder(warpped_feat.permute(0, 2, 1))  # [B,3,N]
         warped = displacement + decoder_input[:, 0:3, :]
-        loss1 = chamfer_loss(encoder_input[:, :3, :], warped, ps=warped.size()[-1])
-
+        # loss1 = chamfer_loss(encoder_input[:, :3, :], warped, ps=warped.size()[-1])
+        loss1 = gaussian_mix_loss(encoder_input[:, :3, :],warped)
         return warped.permute(0, 2, 1), loss1  # , loss2
 
 
